@@ -1,15 +1,15 @@
-#include "Initializer.h"
-#include <iostream>
+#include <Eigen/Core>
 #include <vector>
+#include <iostream>
 
-std::vector<int> test(std::vector<int> vect)
-{
-	return vect;
-}
 
 int main(void)
 {
+	Eigen::MatrixXi mat(3, 3);
+	mat(0, 0) = 1; 	mat(0, 1) = 2; 	mat(0, 2) = 3;
+	mat(1, 0) = 4; 	mat(1, 1) = 5; 	mat(1, 2) = 6;
+	mat(2, 0) = 7; 	mat(2, 1) = 8; 	mat(2, 2) = 9;
 
-	auto a = test({ 1,2,3,4,5 });
-	return 0;
+	std::cout << mat.row(0) << std::endl;
+
 }
