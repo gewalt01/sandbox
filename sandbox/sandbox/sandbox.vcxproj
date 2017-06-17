@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Initializer.h" />
+    <ClInclude Include="MovieLens100k.h" />
     <ClInclude Include="MultiStateCounter.h" />
     <ClInclude Include="MultiStateCounterEigen.h" />
     <ClInclude Include="SplitTongue.h" />

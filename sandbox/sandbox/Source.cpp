@@ -1,15 +1,11 @@
-#include <Eigen/Core>
-#include <vector>
+#include "MovieLens100k.h"
 #include <iostream>
-
+#include <string>
 
 int main(void)
 {
-	Eigen::MatrixXi mat(3, 3);
-	mat(0, 0) = 1; 	mat(0, 1) = 2; 	mat(0, 2) = 3;
-	mat(1, 0) = 4; 	mat(1, 1) = 5; 	mat(1, 2) = 6;
-	mat(2, 0) = 7; 	mat(2, 1) = 8; 	mat(2, 2) = 9;
-
-	std::cout << mat.row(0) << std::endl;
-
+	MovieLens100k ml(std::string("ml-100k/ua.base"));
+	std::string str;
+	std::cin >> str;
+	return 0;
 }
