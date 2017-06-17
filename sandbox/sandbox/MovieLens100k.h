@@ -3,38 +3,22 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include "CFDataset.h"
 
 class MovieLens100k
 {
 public:
-	std::vector< std::vector<int> > existDataPoint;
-	std::vector< std::vector<int> > dataset;
-
-public:
 	MovieLens100k() = default;
-	MovieLens100k(const std::string & fname);
 	~MovieLens100k() = default;
-	void readDataset(const std::string & fname);
+	CFDataset readDataset(const std::string & fname);
 };
 
-inline MovieLens100k::MovieLens100k(const std::string & fname)
+inline CFDataset MovieLens100k::readDataset(const std::string & fname)
 {
-	int users = 943;
-	int items = 1682;
+	size_t users = 943;
+	size_t items = 1682;
 
-	this->existDataPoint = std::vector< std::vector<int> >(users);
-	for (auto & user : existDataPoint) user = std::vector<int>(items, 0);
-
-	this->dataset = std::vector< std::vector<int> >(users);
-	for (auto & data : dataset) data = std::vector<int>(items, 0);
-
-	this->readDataset(fname);
-}
-
-inline void MovieLens100k::readDataset(const std::string & fname)
-{
-	int users = 943;
-	int items = 1682;
+	CFDataset cfd(users, items);
 
 	std::ifstream ifs(fname, std::ios::in);
 
@@ -50,8 +34,9 @@ inline void MovieLens100k::readDataset(const std::string & fname)
 		std::stringstream ss(line_str);
 
 		ss >> user_id >> item_id >> rating;
-		this->existDataPoint[user_id - 1][item_id - 1] = 1;
-		this->dataset[user_id - 1][item_id - 1] = rating - 1;
+		cfd.existDataPoint[user_id - 1][item_id - 1] = 1;
+		cfd.dataset[user_id - 1][item_id - 1] = rating - 1;
 	}
 
+	return cfd;
 }
