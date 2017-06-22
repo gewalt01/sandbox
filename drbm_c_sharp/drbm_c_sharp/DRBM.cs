@@ -137,7 +137,6 @@ namespace drbm_c_sharp
                 }
             }
 
-            // prod_j 2cosh pre calc
             List<List<double>> prod_table = this._calcProdOneExpAndExp(ref data);
 
             for (int i = 0; i < this.xSize; i++)
@@ -205,7 +204,6 @@ namespace drbm_c_sharp
                 }
             }
 
-            // prod_j 2cosh pre calc
             List<List<double>> prod_table = this._calcProdOneExpAndExp(ref data);
 
             for (int j = 0; j < this.hSize; j++)
