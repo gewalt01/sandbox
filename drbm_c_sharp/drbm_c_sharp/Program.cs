@@ -11,17 +11,21 @@ namespace drbm_c_sharp
         static void Main(string[] args)
         {
             UnityJanken janken = new UnityJanken(5);
-            int i = 0;
-            var rand = new System.Random();
+            string[] name = new string[] {"グー", "チョキ", "パー" };
             while(true)
             {
-                i = (i + 1)  % 3;
-                int my_no = i;
-//                int my_no = int.Parse(Console.ReadLine());
-                int unity_no = janken.game(my_no);
-                Console.WriteLine("I:" + my_no + ", Unity: " + unity_no + ", UnityWin:" + (unity_no == janken.getWinPattern(my_no)));
+                Console.Write("手を選べ[0: グー, 1: チョキ, 3: パー]...");
+                int my_no = int.Parse(Console.ReadLine());
+                if (my_no < 0 || 2 < my_no) continue;
+
+                int enemy_no = janken.game(my_no);
+                string messege = enemy_no == janken.getWinPattern(my_no) ? "You Lose" : "";
+
+                Console.WriteLine("You:" + name[my_no] + ", Enemy: " + name[enemy_no]);
+                Console.WriteLine( messege );
+                Console.WriteLine();
             }
-            
+
         }
     }
 }
