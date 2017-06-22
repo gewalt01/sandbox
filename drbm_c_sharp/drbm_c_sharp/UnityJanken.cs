@@ -8,11 +8,12 @@ namespace drbm_c_sharp
 {
     class UnityJanken
     {
-        public int historySize;  // 何手前まで考慮する?(|可視変数|= historySize * 4)
+        public const int OneOfKSize = 3;
+        public int historySize;  // 何手前まで考慮する?(|可視変数|= historySize * OneOfKSize)
         public Queue<int> history = new Queue<int>();  // 相手の手前まで覚えておく? (訓練データの数)
         public int maxDataSize = 10; //さらに何件分まで訓練データとして使う?
         public DRBM drbm;
-        public int hiddenSize = 3;
+        public int hiddenSize = 4;
         public int batchSize = 10;  // とりあえず1, データ少ないとき適宜対応
         public double learningRate = 0.2;  // とりあえず0.2
         public int epoch = 10;  // とりあえず10回
@@ -22,10 +23,10 @@ namespace drbm_c_sharp
         {
             this.historySize = histry_size;
 
-            // 可視変数: {不明, グー, チョキ, パー}^history_size -> 4 * history_size
+            // 可視変数: {不明, グー, チョキ, パー}^history_size -> OneOfKSize * history_size
             // 隠れ変数: とりあえず50
             // 出力は{グー, チョキ, パー}の3種類
-            this.drbm = new DRBM(4 * histry_size, 50, 3);
+            this.drbm = new DRBM(OneOfKSize * histry_size, hiddenSize, OneOfKSize);
         }
 
         // class_no: 相手の新しく出した手
@@ -42,6 +43,7 @@ namespace drbm_c_sharp
 
             // 勝てる手のラベルセット作成
             List<int> label = new List<int>(this.history.Count);
+
             //そっから過去のはT+1に勝てる手と対応づける
             for (int i = 0; i < history.Count - 1; i++)
             {
@@ -51,9 +53,8 @@ namespace drbm_c_sharp
                 label.Add(tmp_win_no);
             }
 
-            if (0 < history.Count)
+            if (0 < history.Count)  // 初回は全開の記録がないため対策
             {
-                //最新履歴は今回出された手に勝つ
                 label.Add(this.getWinPattern(class_no));
             }
 
@@ -71,7 +72,7 @@ namespace drbm_c_sharp
         {
             // {グー, チョキ, パー} = {0, 1, 2}
             // 勝つには{パー, グー, チョキ} = {2, 0, 1}
-            int[] pattern = new int[3] { 2, 0, 1 };
+            int[] pattern = new int[OneOfKSize] { 2, 0, 1 };
 
             return pattern[class_no];
         }
@@ -91,7 +92,7 @@ namespace drbm_c_sharp
         //  クラス番号をOne-of-K表現に
         public List<double> toOneOfK(int class_no)
         {
-            var ook = (new double[4]).ToList();
+            var ook = (new double[OneOfKSize]).ToList();
             ook[class_no + 1] = 1.0;
 
             return ook;
@@ -102,11 +103,11 @@ namespace drbm_c_sharp
         {
             List<int> class_list = new List<int>();
 
-            for (int i = 0; i < ook.Count; i += 4)
+            for (int i = 0; i < ook.Count; i += OneOfKSize)
             {
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < OneOfKSize; j++)
                 {
-                    if (Math.Abs(ook[4 * i + j] - 1.0) < 0.00001)
+                    if (Math.Abs(ook[OneOfKSize * i + j] - 1.0) < 0.00001)
                     {
                         class_list.Add(j);
                         break;
@@ -130,33 +131,19 @@ namespace drbm_c_sharp
         public List<double> makeInputOneOfKFromHistory(int newer)
         {
             // 古いのを前に格納せよ
-            var data = (new double[4 * this.historySize]).ToList();// 学習データ
+            var data = (new double[OneOfKSize * this.historySize]).ToList();// 学習データ
 
             // 古い順に取得
             for (int i = 0; i < historySize; i++)
             {
                 var ook = makeOneOfKFromHistory(newer + (historySize - 1 - i));
 
-                for (int k = 0; k < 4; k++)
+                for (int k = 0; k < OneOfKSize; k++)
                 {
-                    data[i * 4 + k] = ook[k];  //  順番大丈夫?
+                    data[i * OneOfKSize + k] = ook[k];  //  順番大丈夫?
                 }
             }
 
-            /*
-            //for(int j = i; j < history.Count && j < historySize; j++)
-            for (int j = s - (historySize - 1); j < history.Count && j < historySize; j++)
-            {
-                if (j < 0) continue;
-
-                var ook = makeOneOfKFromHistory(j);
-
-                for (int k = 0; k < 4; k++)
-                {
-                    data[(historySize - 1 - j) * 4 + k] = ook[k];  //  順番大丈夫?
-                }
-            }
-            */
 
             return data;
         }
@@ -164,7 +151,7 @@ namespace drbm_c_sharp
 
         public List<double> makeOneOfKFromHistory(int newer)
         {
-            List<double> ook = (new double[4]).ToList();
+            List<double> ook = (new double[OneOfKSize]).ToList();
 
             var tmp_hist = history.ToList();
 
@@ -173,7 +160,7 @@ namespace drbm_c_sharp
 
             var class_no = tmp_hist[index];
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < OneOfKSize; i++)
             {
                 if (i == class_no)
                 {
