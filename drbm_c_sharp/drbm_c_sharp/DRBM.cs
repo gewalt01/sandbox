@@ -170,7 +170,6 @@ namespace drbm_c_sharp
                 exp_values[i] = 1.0 / norm_const;
             }
 
-            // prod_j 2cosh pre calc
             List<List<double>> prod_table = this._calcProdOneExpAndExp(ref data);
 
             for (int j = 0; j < this.hSize; j++)
