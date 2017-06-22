@@ -10,6 +10,7 @@ namespace drbm_c_sharp
     {
         static void Main(string[] args)
         {
+            // UnityJankenの引数: 何手前まで考慮するか?
             UnityJanken janken = new UnityJanken(5);
             string[] name = new string[] {"グー", "チョキ", "パー" };
             while(true)
