@@ -8,6 +8,8 @@ namespace drbm_c_sharp
 {
     class DRBM
     {
+        protected System.Random rand = new System.Random();
+
         public int xSize; // input node size
         public int hSize; // hidden node size
         public int ySize; // output node size
@@ -89,7 +91,7 @@ namespace drbm_c_sharp
             List<List<double>> prod_table = new List<List<double>>(this.hSize);
             for (int i = 0; i < this.hSize; i++)
             {
-                prod_table[i] = new List<double>(this.ySize);
+                prod_table.Add((new double[this.ySize]).ToList());
                 for (int j = 0; j < ySize; j++)
                 {
                     prod_table[i][j] = 1.0;
@@ -128,7 +130,7 @@ namespace drbm_c_sharp
 
             for (int i = 0; i < this.xSize; i++)
             {
-                exp_values[i] = new List<double>(this.hSize);
+                exp_values.Add((new double[this.hSize]).ToList());
                 for (int j = 0; j < this.hSize; j++)
                 {
                     exp_values[i][j] = 1.0 / norm_const;
@@ -161,8 +163,8 @@ namespace drbm_c_sharp
             this.x = data;
 
             double norm_const = this.normalizeConstant();
-            List<double> exp_values = new List<double>(this.hSize);
-
+            List<double> exp_values = (new double[this.hSize]).ToList();
+            
             for (int i = 0; i < this.hSize; i++)
             {
                 exp_values[i] = 1.0 / norm_const;
@@ -196,7 +198,7 @@ namespace drbm_c_sharp
 
             for (int i = 0; i < this.hSize; i++)
             {
-                exp_values[i] = new List<double>(this.ySize);
+                exp_values.Add((new double[this.ySize]).ToList());
 
                 for (int j = 0; j < this.ySize; j++)
                 {
@@ -226,7 +228,8 @@ namespace drbm_c_sharp
             this.x = data;
             double norm_const = this.normalizeConstant();
 
-            List<double> exp_vals = new List<double>(this.ySize);
+            List<double> exp_vals = (new double[this.ySize]).ToList();
+            
             for (int i = 0; i < this.ySize; i++)
             {
                 exp_vals[i] = 1.0 / norm_const;
@@ -248,14 +251,13 @@ namespace drbm_c_sharp
 
         protected double _uniform()
         {
-            // FIXME: Unityで[0, 1]の一様乱数を生成する処理を実装してください
-            System.Random rand = new System.Random(100);
-            return rand.NextDouble();
+            // FIXME: Unityで[-0.01, 0.01]の一様乱数を生成する処理を実装してください
+            return 2 * (this.rand.NextDouble() - 0.5) * 0.01;
         }
 
         protected void _shuffle<T>(ref List<T> array)
         {
-            System.Random rand = new System.Random(100);
+            System.Random rand = new System.Random();
 
             int n = array.Count;
             T tmp;
@@ -275,25 +277,25 @@ namespace drbm_c_sharp
             this.ySize = y_size;
 
             // constracting vars & params
-            this.x = new List<double>(x_size);
-            this.h = new List<double>(h_size);
-            this.y = new List<double>(y_size);
+            this.x = (new double[x_size]).ToList();
+            this.h = (new double[h_size]).ToList();
+            this.y = (new double[y_size]).ToList();
 
             this.w = new List<List<double>>(x_size);
             for (int i = 0; i < this.xSize; i++)
             {
-                this.w[i] = new List<double>(h_size);
+                this.w.Add((new double[h_size]).ToList());
             }
 
-            this.c = new List<double>(h_size);
+            this.c = (new double[h_size]).ToList();
 
             this.v = new List<List<double>>(h_size);
             for (int i = 0; i < this.hSize; i++)
             {
-                v[i] = new List<double>(y_size);
+                v.Add((new double[y_size]).ToList());
             }
 
-            this.d = new List<double>(y_size);
+            this.d = (new double[y_size]).ToList();
 
             // initialize params
             for (int i = 0; i < this.xSize; i++)
@@ -371,7 +373,7 @@ namespace drbm_c_sharp
             double norm_const = this.normalizeConstant();
 
             // discriminate
-            List<double> probs = new List<double>(this.ySize);
+            List<double> probs = (new double[this.ySize]).ToList();
 
             for (int k = 0; k < this.ySize; k++)
             {
@@ -393,61 +395,64 @@ namespace drbm_c_sharp
             List<List<double>> mom_xh = new List<List<double>>(this.xSize);
             for (int i = 0; i < this.xSize; i++)
             {
-                mom_xh[i] = new List<double>(this.hSize);
+                mom_xh.Add((new double[this.hSize]).ToList());
             }
 
-            List<double> mom_h = new List<double>(this.hSize);
+            List<double> mom_h = (new double[this.hSize]).ToList();
 
             List<List<double>> mom_hy = new List<List<double>>(this.hSize);
-            for (int i = 0; i < this.ySize; i++)
+            for (int i = 0; i < this.hSize; i++)
             {
-                mom_hy[i] = new List<double>(this.ySize);
+                mom_hy.Add((new double[this.ySize]).ToList());
             }
 
-            List<double> mom_y = new List<double>(this.ySize);
+            List<double> mom_y = (new double[this.ySize]).ToList();
 
-            List<int> indexes = new List<int>(labelset.Count);
+            List<int> indexes = (new int[labelset.Count]).ToList();
 
             for (int i = 0; i < indexes.Count; i++) indexes[i] = i;
+
+            // shuffle index
+            this._shuffle(ref indexes);
+
+            batch_size = indexes.Count < batch_size ? indexes.Count : batch_size;
+ 
 
             for (int e = 0; e < epoch; e++)
             {
                 List<List<double>> xh_data = new List<List<double>>(this.xSize);
                 for (int i = 0; i < this.xSize; i++)
                 {
-                    xh_data[i] = new List<double>(this.hSize);
+                    xh_data.Add((new double[this.hSize]).ToList());
                 }
 
-                List<double> h_data = new List<double>(this.hSize);
+                List<double> h_data = (new double[this.hSize]).ToList();
 
                 List<List<double>> hy_data = new List<List<double>>(this.hSize);
                 for (int i = 0; i < this.hSize; i++)
                 {
-                    hy_data[i] = new List<double>(this.ySize);
+                    hy_data.Add((new double[this.ySize]).ToList());
                 }
 
-                List<double> y_data = new List<double>(this.ySize);
+                List<double> y_data = (new double[this.ySize]).ToList();
 
                 List<List<double>> xh_drbm = new List<List<double>>(this.xSize);
                 for (int i = 0; i < this.xSize; i++)
                 {
-                    xh_drbm[i] = new List<double>(this.hSize);
+                    xh_drbm.Add((new double[this.hSize]).ToList());
                 }
 
-                List<double> h_drbm = new List<double>(this.hSize);
+                List<double> h_drbm = (new double[this.hSize]).ToList();
 
                 List<List<double>> hy_drbm = new List<List<double>>(this.hSize);
                 for (int i = 0; i < this.hSize; i++)
                 {
-                    hy_drbm[i] = new List<double>(this.ySize);
+                    hy_drbm.Add((new double[this.ySize]).ToList());
                 }
 
-                List<double> y_drbm = new List<double>(this.ySize);
+                List<double> y_drbm = (new double[this.ySize]).ToList();
 
 
-
-                // shuffle index
-                this._shuffle(ref indexes);
 
                 for (int n = 0; n < batch_size; n++)
                 {
