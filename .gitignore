@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 /sandbox/sandbox/ml-100k
+/OpenCV/OpenCV/out.png
+/OpenCV/OpenCV/img.png

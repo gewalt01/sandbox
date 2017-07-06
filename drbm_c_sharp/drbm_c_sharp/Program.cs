@@ -11,20 +11,41 @@ namespace drbm_c_sharp
         static void Main(string[] args)
         {
             // UnityJankenの引数: 何手前まで考慮するか?
-            UnityJanken janken = new UnityJanken(5);
+            UnityJanken janken = new UnityJanken(6);
             string[] name = new string[] {"グー", "チョキ", "パー" };
-            while(true)
+
+            double num = 0;  // 試行回数
+            double lose_num = 0;  // 負けた回数
+
+            int count = 100;
+
+            while(0 < count)
             {
-                Console.Write("手を選べ[0: グー, 1: チョキ, 3: パー]...");
-                int my_no = int.Parse(Console.ReadLine());
-                if (my_no < 0 || 2 < my_no) continue;
+                int my_no = 0;
+                Console.Write("手を選べ[1: グー, 2: チョキ, 3: パー]...");
+                Console.Write("(残り" + count + "回)->");
+
+                try
+                {
+                    my_no = int.Parse(Console.ReadLine()) - 1;
+                    if (my_no < 0 || 3 < my_no) throw new Exception();
+                } catch
+                {
+                    continue;
+                }
 
                 int enemy_no = janken.game(my_no);
-                string messege = enemy_no == janken.getWinPattern(my_no) ? "You Lose" : "";
+                bool is_lose = enemy_no == janken.getWinPattern(my_no);
+                string messege = is_lose ? "You Lose" : "";
+                num++;
+                lose_num += is_lose ? 1 : 0;
+
 
                 Console.WriteLine("You:" + name[my_no] + ", Enemy: " + name[enemy_no]);
                 Console.WriteLine( messege );
-                Console.WriteLine();
+                Console.WriteLine("敗率: " + lose_num/num);
+
+                count--;
             }
 
         }

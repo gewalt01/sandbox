@@ -11,9 +11,9 @@ namespace drbm_c_sharp
         public const int OneOfKSize = 3;
         public int historySize;  // 何手前まで考慮する?(|可視変数|= historySize * OneOfKSize)
         public Queue<int> history = new Queue<int>();  // 相手の手前まで覚えておく? (訓練データの数)
-        public int maxDataSize = 10; //さらに何件分まで訓練データとして使う?
+        public int maxDataSize = 200; //さらに何件分まで訓練データとして使う?
         public DRBM drbm;
-        public int hiddenSize = 4;
+        public int hiddenSize = 20;
         public int batchSize = 10;  // とりあえず1, データ少ないとき適宜対応
         public double learningRate = 0.2;  // とりあえず0.2
         public int epoch = 10;  // とりあえず10回
