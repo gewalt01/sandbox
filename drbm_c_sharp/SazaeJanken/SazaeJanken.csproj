@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1C1B8830-7BFE-4E57-902A-DAF2F0F509CD}</ProjectGuid>
+    <ProjectGuid>{B2946110-9F4F-405B-81A4-854DA38BECE2}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>drbm_c_sharp</RootNamespace>
-    <AssemblyName>drbm_c_sharp</AssemblyName>
+    <RootNamespace>SazaeJanken</RootNamespace>
+    <AssemblyName>SazaeJanken</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -43,11 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DRBM.cs" />
-    <Compile Include="DRBMParamator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnityJanken.cs" />
-    <Compile Include="UnityJankenSettai.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

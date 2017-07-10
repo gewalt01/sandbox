@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace drbm_c_sharp
 {
-    public class DRBM
+    class DRBM
     {
         protected System.Random rand = new System.Random();
 
@@ -19,7 +20,10 @@ namespace drbm_c_sharp
         List<double> y;  // output nodes
 
         // params
-        DRBMParamator param;
+        List<List<double>> w;  // coupling params between input and hidden    
+        List<double> c;  // hidden bias params
+        List<List<double>> v;  // cpupling params between hidden and output
+        List<double> d;  // output bias params
 
         protected double _oneExp(int j, int k)
         {
@@ -56,11 +60,11 @@ namespace drbm_c_sharp
 
             for (int i = 0; i < this.xSize; i++)
             {
-                lambda += this.param.w[i][j] * data[i];
+                lambda += this.w[i][j] * data[i];
             }
 
-            lambda += this.param.c[j];
-            lambda += this.param.v[j][label_no];
+            lambda += this.c[j];
+            lambda += this.v[j][label_no];
 
             return 1.0 / (1.0 + Math.Exp(-lambda));
         }
@@ -71,11 +75,11 @@ namespace drbm_c_sharp
 
             for (int i = 0; i < this.xSize; i++)
             {
-                val += this.param.w[i][j] * this.x[i];
+                val += this.w[i][j] * this.x[i];
             }
 
-            val += this.param.c[j];
-            val += this.param.v[j][k];
+            val += this.c[j];
+            val += this.v[j][k];
 
             return val;
         }
@@ -143,7 +147,7 @@ namespace drbm_c_sharp
 
                     for (int k = 0; k < this.ySize; k++)
                     {
-                        sum_k += prod_table[j][k] * Math.Exp(this.param.c[k]);
+                        sum_k += prod_table[j][k] * Math.Exp(this.d[k]);
                     }
 
                     exp_values[i][j] *= sum_k * data[i];
@@ -159,7 +163,7 @@ namespace drbm_c_sharp
 
             double norm_const = this.normalizeConstant();
             List<double> exp_values = (new double[this.hSize]).ToList();
-
+            
             for (int i = 0; i < this.hSize; i++)
             {
                 exp_values[i] = 1.0 / norm_const;
@@ -173,7 +177,7 @@ namespace drbm_c_sharp
 
                 for (int k = 0; k < this.ySize; k++)
                 {
-                    tmp_val += Math.Exp(this.param.c[k]) * prod_table[j][k];
+                    tmp_val += Math.Exp(this.d[k]) * prod_table[j][k];
                 }
 
                 exp_values[j] *= tmp_val;
@@ -206,7 +210,7 @@ namespace drbm_c_sharp
             {
                 for (int k = 0; k < this.ySize; k++)
                 {
-                    exp_values[j][k] *= Math.Exp(this.param.c[k]) * prod_table[j][k];
+                    exp_values[j][k] *= Math.Exp(this.d[k]) * prod_table[j][k];
 
                 }
 
@@ -222,7 +226,7 @@ namespace drbm_c_sharp
             double norm_const = this.normalizeConstant();
 
             List<double> exp_vals = (new double[this.ySize]).ToList();
-
+            
             for (int i = 0; i < this.ySize; i++)
             {
                 exp_vals[i] = 1.0 / norm_const;
@@ -231,7 +235,7 @@ namespace drbm_c_sharp
             for (int k = 0; k < this.ySize; k++)
             {
 
-                exp_vals[k] *= Math.Exp(this.param.c[k]);
+                exp_vals[k] *= Math.Exp(this.d[k]);
 
                 for (int j = 0; j < this.hSize; j++)
                 {
@@ -242,6 +246,11 @@ namespace drbm_c_sharp
             return exp_vals;
         }
 
+        protected double _uniform()
+        {
+            // FIXME: Unityで[-0.01, 0.01]の一様乱数を生成する処理を実装してください
+            return 2 * (this.rand.NextDouble() - 0.5) * 0.01;
+        }
 
         protected void _shuffle<T>(ref List<T> array)
         {
@@ -264,13 +273,53 @@ namespace drbm_c_sharp
             this.hSize = h_size;
             this.ySize = y_size;
 
-            // constracting vars
+            // constracting vars & params
             this.x = (new double[x_size]).ToList();
             this.h = (new double[h_size]).ToList();
             this.y = (new double[y_size]).ToList();
 
-            //params
-            this.param = new DRBMParamator(x_size, h_size, y_size);
+            this.w = new List<List<double>>(x_size);
+            for (int i = 0; i < this.xSize; i++)
+            {
+                this.w.Add((new double[h_size]).ToList());
+            }
+
+            this.c = (new double[h_size]).ToList();
+
+            this.v = new List<List<double>>(h_size);
+            for (int i = 0; i < this.hSize; i++)
+            {
+                v.Add((new double[y_size]).ToList());
+            }
+
+            this.d = (new double[y_size]).ToList();
+
+            // initialize params
+            for (int i = 0; i < this.xSize; i++)
+            {
+                for (int j = 0; j < this.hSize; j++)
+                {
+                    this.w[i][j] = this._uniform();
+                }
+            }
+
+            for (int i = 0; i < this.hSize; i++)
+            {
+                this.c[i] = this._uniform();
+            }
+
+            for (int i = 0; i < this.hSize; i++)
+            {
+                for (int j = 0; j < this.ySize; j++)
+                {
+                    this.v[i][j] = this._uniform();
+                }
+            }
+
+            for (int i = 0; i < this.ySize; i++)
+            {
+                this.d[i] = this._uniform();
+            }
         }
 
 
@@ -282,7 +331,7 @@ namespace drbm_c_sharp
             Func<int, double> exp_prod_one_plus_exp =
                 (k) =>
                 {
-                    double constant = Math.Exp(this.param.c[k]);
+                    double constant = Math.Exp(this.d[k]);
 
                     for (int j = 0; j < this.hSize; j++)
                     {
@@ -308,7 +357,7 @@ namespace drbm_c_sharp
             Func<int, double, double> class_prob =
                 (k, norm_constnce) =>
                 {
-                    double potential = Math.Exp(this.param.c[k]) / norm_constnce;
+                    double potential = Math.Exp(this.d[k]) / norm_constnce;
 
                     for (int j = 0; j < this.hSize; j++)
                     {
@@ -364,7 +413,7 @@ namespace drbm_c_sharp
             this._shuffle(ref indexes);
 
             batch_size = indexes.Count < batch_size ? indexes.Count : batch_size;
-
+ 
 
             for (int e = 0; e < epoch; e++)
             {
@@ -468,7 +517,7 @@ namespace drbm_c_sharp
                         var delta = 0.95 * mom_xh[i][j] + learning_rate * (xh_data[i][j] - xh_drbm[i][j]);
 
                         mom_xh[i][j] = delta;
-                        this.param.w[i][j] += delta;
+                        this.w[i][j] += delta;
                     }
                 }
 
@@ -477,14 +526,14 @@ namespace drbm_c_sharp
                     var delta = 0.95 * mom_h[j] + learning_rate * (h_data[j] - h_drbm[j]);
 
                     mom_h[j] = delta;
-                    this.param.c[j] += delta;
+                    this.c[j] += delta;
 
                     for (int k = 0; k < this.ySize; k++)
                     {
                         var delta2 = 0.95 * mom_hy[j][k] + learning_rate * (hy_data[j][k] - hy_drbm[j][k]);
 
                         mom_hy[j][k] = delta2;
-                        this.param.v[j][k] += delta2;
+                        this.v[j][k] += delta2;
                     }
                 }
 
@@ -493,7 +542,7 @@ namespace drbm_c_sharp
                     var delta = 0.95 * mom_y[k] + learning_rate * (y_data[k] - y_drbm[k]);
 
                     mom_y[k] = delta;
-                    this.param.c[k] += delta;
+                    this.d[k] += delta;
                 }
             }
         }

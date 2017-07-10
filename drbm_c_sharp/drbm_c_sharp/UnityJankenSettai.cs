@@ -5,7 +5,7 @@ using System.Text;
 
 namespace drbm_c_sharp
 {
-    public class UnityJanken
+    public class UnityJankenSettai
     {
         public const int OneOfKSize = 3;
         public int historySize = 5;  // 何手前まで考慮する?(|可視変数|= historySize * OneOfKSize)
@@ -18,7 +18,7 @@ namespace drbm_c_sharp
         public int epoch = 10;  // とりあえず10回
 
 
-        public UnityJanken(int histry_size)
+        public UnityJankenSettai(int histry_size)
         {
             this.historySize = histry_size;
 
@@ -40,21 +40,21 @@ namespace drbm_c_sharp
             }
 
 
-            // 勝てる手のラベルセット作成
+            // 負ける手のラベルセット作成
             List<int> label = new List<int>(this.history.Count);
 
-            //そっから過去のはT+1に勝てる手と対応づける
+            //そっから過去のはT+1に負ける手と対応づける
             for (int i = 0; i < history.Count - 1; i++)
             {
-                //勝てる手は?
+                //負ける手は?
                 var hist = this.history.ToList();
-                int tmp_win_no = this.getWinPattern(hist[i + 1]);
-                label.Add(tmp_win_no);
+                int tmp_lose_no = this.getLosePattern(hist[i + 1]);
+                label.Add(tmp_lose_no);
             }
 
             if (0 < history.Count)  // 初回は全開の記録がないため対策
             {
-                label.Add(this.getWinPattern(class_no));
+                label.Add(this.getLosePattern(class_no));
             }
 
 
@@ -66,12 +66,12 @@ namespace drbm_c_sharp
 
         }
 
-        //  入力に対して勝てる手を決める(後だしじゃんけん)
-        public int getWinPattern(int class_no)
+        //  入力に対して負ける手を決める(後だしじゃんけん)
+        public int getLosePattern(int class_no)
         {
             // {グー, チョキ, パー} = {0, 1, 2}
-            // 勝つには{パー, グー, チョキ} = {2, 0, 1}
-            int[] pattern = new int[OneOfKSize] { 2, 0, 1 };
+            // 負けるには{パー, グー, チョキ} = {1, 2, 0}
+            int[] pattern = new int[OneOfKSize] { 1, 2, 0 };
 
             return pattern[class_no];
         }
@@ -119,7 +119,7 @@ namespace drbm_c_sharp
             return class_list;
         }
 
-        //  相手に勝てそうな手の予想
+        //  相手に負けそうな手の予想
         public int inference()
         {
             List<double> data = makeInputOneOfKFromHistory(0);

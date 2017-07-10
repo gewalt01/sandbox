@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace drbm_c_sharp
 {
-    public class UnityJanken
+    class UnityJanken
     {
         public const int OneOfKSize = 3;
-        public int historySize = 5;  // 何手前まで考慮する?(|可視変数|= historySize * OneOfKSize)
+        public int historySize;  // 何手前まで考慮する?(|可視変数|= historySize * OneOfKSize)
         public Queue<int> history = new Queue<int>();  // 相手の手前まで覚えておく? (訓練データの数)
         public int maxDataSize = 200; //さらに何件分まで訓練データとして使う?
         public DRBM drbm;
@@ -48,7 +49,7 @@ namespace drbm_c_sharp
             {
                 //勝てる手は?
                 var hist = this.history.ToList();
-                int tmp_win_no = this.getWinPattern(hist[i + 1]);
+                int tmp_win_no = this.getWinPattern(hist[i+1]);
                 label.Add(tmp_win_no);
             }
 
@@ -169,16 +170,6 @@ namespace drbm_c_sharp
             }
 
             return ook;
-        }
-
-        // 0: win
-        // 1: drow
-        // 2: lose
-        public int judge(int my_no, int your_no)
-        {
-            int[,] judge = new int[,] { { 1, 0, 2 }, { 2, 1, 0 }, { 0, 2, 1 } };
-
-            return judge[my_no, your_no];
         }
     }
 }

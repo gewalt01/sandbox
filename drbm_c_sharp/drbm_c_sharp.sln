@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "drbm_c_sharp", "drbm_c_sharp\drbm_c_sharp.csproj", "{1C1B8830-7BFE-4E57-902A-DAF2F0F509CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SazaeJanken", "SazaeJanken\SazaeJanken.csproj", "{B2946110-9F4F-405B-81A4-854DA38BECE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{1C1B8830-7BFE-4E57-902A-DAF2F0F509CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C1B8830-7BFE-4E57-902A-DAF2F0F509CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C1B8830-7BFE-4E57-902A-DAF2F0F509CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2946110-9F4F-405B-81A4-854DA38BECE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2946110-9F4F-405B-81A4-854DA38BECE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2946110-9F4F-405B-81A4-854DA38BECE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2946110-9F4F-405B-81A4-854DA38BECE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
